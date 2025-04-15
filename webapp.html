@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jump Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(to bottom, #ffffff, #ffd1dc);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: sans-serif;
+    }
+    h1 {
+      margin: 20px;
+    }
+    .game {
+      position: relative;
+      width: 800px;
+      height: 200px;
+      background-color: #ffebf0;
+      overflow: hidden;
+      border: 4px solid #333;
+    }
+    .mario {
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      width: 50px;
+      height: 50px;
+      background-color: red;
+      border-radius: 10px;
+    }
+    .mario.jump {
+      animation: jump 0.6s ease-out;
+    }
+    @keyframes jump {
+      0%   { bottom: 0; }
+      50%  { bottom: 120px; }
+      100% { bottom: 0; }
+    }
+    .goomba {
+      position: absolute;
+      bottom: 0;
+      left: 800px;
+      width: 50px;
+      height: 50px;
+      background-color: brown;
+      border-radius: 50%;
+    }
+    @keyframes moveGoomba {
+      0%   { left: 800px; }
+      100% { left: -50px; }
+    }
+    #message {
+      margin-top: 10px;
+      font-size: 20px;
+      color: #333;
+    }
+    #score {
+      margin-top: 5px;
+      font-size: 18px;
+      color: #444;
+    }
+    #startButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #ff6699;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    }
+    #startButton:hover {
+      background-color: #ff3366;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Jump Game</h1>
+  <button id="startButton">Start Game</button>
+  <div class="game">
+    <div class="mario" id="mario"></div>
+    <div class="goomba" id="goomba"></div>
+  </div>
+  <div id="message"></div>
+  <div id="score">Score: 0</div>
+
+  <script>
+    const mario = document.getElementById("mario");
+    const goomba = document.getElementById("goomba");
+    const message = document.getElementById("message");
+    const startButton = document.getElementById("startButton");
+    const scoreDisplay = document.getElementById("score");
+
+    let gameStarted = false;
+    let gameLoop;
+    let scoreLoop;
+    let score = 0;
+
+    function startGame() {
+      // Reset states
+      message.textContent = "";
+      score = 0;
+      scoreDisplay.textContent = "Score: 0";
+      gameStarted = true;
+
+      // Reset Goomba animation
+      goomba.style.animation = "none";
+      goomba.offsetHeight; // reflow
+      goomba.style.animation = "moveGoomba 2s linear infinite";
+
+      // Start collision and score loops
+      gameLoop = setInterval(checkCollision, 10);
+      scoreLoop = setInterval(() => {
+        if (gameStarted) {
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+        }
+      }, 200);
+
+      startButton.style.display = "none";
+    }
+
+    function gameOver() {
+      gameStarted = false;
+      clearInterval(gameLoop);
+      clearInterval(scoreLoop);
+      goomba.style.animation = "none";
+      message.textContent = "💀 Game Over!";
+      startButton.textContent = "Restart Game";
+      startButton.style.display = "inline-block";
+    }
+
+    function checkCollision() {
+      const marioBottom = parseInt(getComputedStyle(mario).getPropertyValue("bottom"));
+      const goombaLeft = parseInt(getComputedStyle(goomba).getPropertyValue("left"));
+
+      if (goombaLeft < 100 && goombaLeft > 40 && marioBottom < 50) {
+        gameOver();
+      }
+    }
+
+    function jump() {
+      if (!mario.classList.contains("jump")) {
+        mario.classList.add("jump");
+        setTimeout(() => mario.classList.remove("jump"), 600);
+      }
+    }
+
+    document.addEventListener("keydown", function(e) {
+      if (e.code === "Space" && gameStarted) {
+        jump();
+      }
+    });
+
+    startButton.addEventListener("click", startGame);
+  </script>
+  <br>
+  <br>
+  <br>
+  <br>
+  <a href="scratch.html">Drama</a>
+
+
+</body>
+</html>
